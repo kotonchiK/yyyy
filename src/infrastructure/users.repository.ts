@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 import { CreateUserDto } from '../api/models/input/create.user.model';
 import { UpdateUserDto } from '../api/models/input/update.user.model';
-import { Error } from '../api/models/output/error';
 
 @Injectable()
 export class UsersRepository {

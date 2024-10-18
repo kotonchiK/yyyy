@@ -9,96 +9,73 @@ import {
   Query,
   ParseIntPipe,
   NotFoundException,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { CreateUserDto } from '../models/input/create.user.model';
 import { UpdateUserDto } from '../models/input/update.user.model';
 import { UserService } from '../../application/services/user.service';
 import { UsersQueryRepository } from '../query-repository/users.query.repo';
+import { validateQueryParameters } from '../../core/query.validator';
+import { ResponseModel } from '../models/output/result.model';
+import { EndpointEnum, RoutingEnum } from '../../core/routes/routes';
 
-@Controller('user')
+@Controller(RoutingEnum.user)
 export class UserController {
   constructor(
     private userService: UserService,
     private userQueryRepo: UsersQueryRepository,
   ) {}
 
-  @Post('create')
-  async createUser(@Body() createUserDto: CreateUserDto) {
+  @Post(EndpointEnum.create)
+  @HttpCode(HttpStatus.CREATED)
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<ResponseModel> {
     return await this.userService.createUser(createUserDto);
   }
 
-  @Get('get/:id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  @Get(EndpointEnum.getById)
+  @HttpCode(HttpStatus.OK)
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<ResponseModel> {
     const user = await this.userQueryRepo.findOne(id);
     if (!user) throw new NotFoundException('User not found');
-    return user;
+    return {
+      success: true,
+      result: user,
+    };
   }
 
-  @Get('get')
-  async findAll(@Query() query: any) {
-    if (Object.keys(query).length === 0) {
-      return {
-        success: false,
-        result: {
-          error: 'No query parameters provided',
-        },
-      };
+  @Get(EndpointEnum.getAll)
+  @HttpCode(HttpStatus.OK)
+  async findAll(@Query() query: any): Promise<ResponseModel> {
+    const validationError = validateQueryParameters(query);
+    if (validationError) {
+      return validationError;
     }
 
-    try {
-      const users = await this.userQueryRepo.findAll(query);
-      return { success: true, result: { users } };
-    } catch (error) {
-      return { success: false, result: { error: error.message } };
-    }
+    const usersResult = await this.userQueryRepo.findAll(query);
+    return { success: true, result: { users: usersResult } };
   }
 
-  @Patch('update/:id')
+  @Patch(EndpointEnum.update)
+  @HttpCode(HttpStatus.OK)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-  ) {
-    try {
-      const user = await this.userService.updateUser(id, updateUserDto);
-      return {
-        success: true,
-        result: {
-          id: user.id,
-          full_name: user.full_name,
-          role: user.role,
-          efficiency: user.efficiency,
-        },
-      };
-    } catch (error) {
-      return { success: false, result: { error: error.message } };
-    }
+  ): Promise<ResponseModel> {
+    return await this.userService.updateUser(id, updateUserDto);
   }
 
-  @Delete('delete/:id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    try {
-      const user = await this.userService.removeUser(id);
-      return {
-        success: true,
-        result: {
-          id: user.id,
-          full_name: user.full_name,
-          role: user.role,
-          efficiency: user.efficiency,
-        },
-      };
-    } catch (error) {
-      return { success: false, result: { error: error.message } };
-    }
+  @Delete(EndpointEnum.deleteById)
+  @HttpCode(HttpStatus.OK)
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<ResponseModel> {
+    return await this.userService.removeUser(id);
   }
 
-  @Delete('delete')
-  async removeAll() {
-    try {
-      await this.userService.removeAll();
-      return { success: true };
-    } catch (error) {
-      return { success: false, result: { error: error.message } };
-    }
+  @Delete(EndpointEnum.deleteAll)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeAll(): Promise<ResponseModel> {
+    return await this.userService.removeAll();
   }
 }
