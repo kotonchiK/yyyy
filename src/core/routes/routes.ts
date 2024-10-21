@@ -7,6 +7,6 @@ export enum EndpointEnum {
   deleteById = '/delete/:id',
   deleteAll = '/delete',
   update = '/update/:id',
-  getById = 'get/:id',
-  getAll = 'get',
+  getById = '/get/:id',
+  getAll = '/get',
 }

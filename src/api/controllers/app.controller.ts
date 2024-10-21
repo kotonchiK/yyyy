@@ -48,14 +48,26 @@ export class UserController {
 
   @Get(EndpointEnum.getAll)
   @HttpCode(HttpStatus.OK)
-  async findAll(@Query() query: any): Promise<ResponseModel> {
-    const validationError = validateQueryParameters(query);
-    if (validationError) {
-      return validationError;
-    }
+  async getUser(@Query() query?: any): Promise<ResponseModel> {
+    // if (query) {
+    //   const validationError = validateQueryParameters(query);
+    //   if (validationError) {
+    //     return validationError;
+    //   }
+    // }
 
     const usersResult = await this.userQueryRepo.findAll(query);
-    return { success: true, result: { users: usersResult } };
+    if (usersResult.length === 1) {
+      return {
+        success: true,
+        result: usersResult[0],
+      };
+    }
+
+    return {
+      success: true,
+      result: { users: usersResult },
+    };
   }
 
   @Patch(EndpointEnum.update)

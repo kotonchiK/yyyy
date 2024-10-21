@@ -15,7 +15,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const errorResponse = exception.getResponse();
 
-    // Формируем ваш кастомный ответ
     const result = {
       success: false,
       // @ts-ignore

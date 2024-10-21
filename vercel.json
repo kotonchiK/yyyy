@@ -11,12 +11,5 @@
       "src": "/api/(.*)",
       "dest": "dist/main.js"
     }
-  ],
-  "env": {
-    "DB_HOST": "185.177.216.77",
-    "DB_PORT": "3306",
-    "DB_USERNAME": "nzTvyJ",
-    "DB_PASSWORD": "yVqDWVgQvsYHpYDO",
-    "DB_DATABASE": "qsgouYUr"
-  }
+  ]
 }

@@ -16,7 +16,7 @@ export class UsersQueryRepository {
     if (query.full_name) filters['full_name'] = query.full_name;
     if (query.id) filters['id'] = query.id;
 
-    return this.userRepository.find({ where: filters });
+    return await this.userRepository.find({ where: filters });
   }
 
   async findOne(id: number): Promise<User | null> {

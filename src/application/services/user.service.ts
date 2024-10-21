@@ -49,7 +49,7 @@ export class UserService {
     return {
       success: true,
       result: {
-        id: user.id,
+        id: id,
         full_name: user.full_name,
         role: user.role,
         efficiency: user.efficiency,
@@ -58,11 +58,7 @@ export class UserService {
   }
 
   async removeAll(): Promise<ResponseModel> {
-    try {
-      await this.userRepository.removeAll();
-      return { success: true };
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+    await this.userRepository.removeAll();
+    return { success: true };
   }
 }
